@@ -15,10 +15,7 @@ import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
+import javax.net.ssl.*;
 import java.io.*;
 import java.net.*;
 import java.util.List;
@@ -131,7 +128,6 @@ public class HttpUtil {
             sslContext.init(null, tm, new java.security.SecureRandom());
             // 从上述SSLContext对象中得到SSLSocketFactory对象
             SSLSocketFactory ssf = sslContext.getSocketFactory();
-
             URL url = new URL(requestUrl);
             HttpsURLConnection httpUrlConn = (HttpsURLConnection) url.openConnection();
             httpUrlConn.setSSLSocketFactory(ssf);
@@ -250,9 +246,29 @@ public class HttpUtil {
 
     }
 
+    /*
+      * 设置证书。
+      */
+    static{
+        javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+                new javax.net.ssl.HostnameVerifier(){
+                    public boolean verify(String hostname,
+                                          javax.net.ssl.SSLSession sslSession) {
+                        //域名或ip地址
+                        if (hostname.equals("https://api.binance.com")) {
+                            return true;
+                        }
+                        return false;
+                    }
+                });
+        //第二个参数为证书的路径
+        System.setProperty("javax.net.ssl.trustStore", "/Users/zhangsl/Documents/Digit.cer");
+        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+    }
+
     public static void main(String[] arg) {
-        JSONObject ret = HttpUtil.httpsRequest("https://api.binance.com//api/v1/depth","GET","symbol=ETHBTC&limit=100");
-        //String ret = HttpUtil.getHttp("https://api.binance.com//api/v1/depth","symbol=ETHBTC&limit=100");
+        //String ret = HttpUtil.HttpGet("https://api.binance.com/api/v1/time");
+        String ret = HttpUtil.getHttp("https://api.binance.com//api/v1/time","");
         System.out.println("结果是：" + ret);
     }
 }
