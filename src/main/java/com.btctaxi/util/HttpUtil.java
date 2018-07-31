@@ -13,12 +13,19 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.json.JSONObject;
 
-import java.io.IOException;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import java.io.*;
+import java.net.*;
 import java.util.List;
 
+
 public class HttpUtil {
-    protected static Logger logger = Logger.getLogger(HttpUtil.class);
+    protected static Logger LOGGER = Logger.getLogger(HttpUtil.class);
     public static CookieStore cookieStore = new BasicCookieStore();
     public static CloseableHttpClient httpCilent = HttpClients.custom().setDefaultCookieStore(cookieStore).build();
 
@@ -44,11 +51,11 @@ public class HttpUtil {
                 StatusCode = httpResponse.getStatusLine().getStatusCode();
                 if (httpResponse.getStatusLine().getStatusCode() == 200) {
                     strResult = EntityUtils.toString(httpResponse.getEntity());
-                    logger.info("post/" + StatusCode + ":" + strResult);
+                    LOGGER.info("post/" + StatusCode + ":" + strResult);
                     return strResult;
                 } else {
                     strResult = "Error Response: " + httpResponse.getStatusLine().toString();
-                    logger.info("post/" + StatusCode + ":" + strResult);
+                    LOGGER.info("post/" + StatusCode + ":" + strResult);
                     strResult = null;
                 }
             } else {
@@ -56,7 +63,7 @@ public class HttpUtil {
             }
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            LOGGER.error(e.getMessage());
         } finally {
 
         }
@@ -79,11 +86,11 @@ public class HttpUtil {
             StatusCode = httpResponse.getStatusLine().getStatusCode();
             if (httpResponse.getStatusLine().getStatusCode() == 200) {
                 srtResult = EntityUtils.toString(httpResponse.getEntity());// 获得返回的结果
-                logger.info("get/" + StatusCode + ":" + srtResult);
+                LOGGER.info("get/" + StatusCode + ":" + srtResult);
                 return srtResult;
             } else {
                 srtResult = EntityUtils.toString(httpResponse.getEntity());// 获得返回的结果
-                logger.info("get/" + StatusCode + ":" + srtResult);
+                LOGGER.info("get/" + StatusCode + ":" + srtResult);
                 return null;
             }
         } catch (IOException e) {
@@ -106,4 +113,146 @@ public class HttpUtil {
         }
     }
 
+    /**
+     * 发起https请求并获取结果
+     *
+     * @param requestUrl    请求地址
+     * @param requestMethod 请求方式（GET、POST）
+     * @param outputStr     提交的数据
+     * @return JSONObject(通过JSONObject.get(key)的方式获取json对象的属性值)
+     */
+    public static JSONObject httpsRequest(String requestUrl, String requestMethod, String outputStr) {
+        JSONObject jsonObject = null;
+        StringBuffer buffer = new StringBuffer();
+        try {
+            // 创建SSLContext对象，并使用我们指定的信任管理器初始化
+            TrustManager[] tm = {new MyX509TrustManager()};
+            SSLContext sslContext = SSLContext.getInstance("SSL", "SunJSSE");
+            sslContext.init(null, tm, new java.security.SecureRandom());
+            // 从上述SSLContext对象中得到SSLSocketFactory对象
+            SSLSocketFactory ssf = sslContext.getSocketFactory();
+
+            URL url = new URL(requestUrl);
+            HttpsURLConnection httpUrlConn = (HttpsURLConnection) url.openConnection();
+            httpUrlConn.setSSLSocketFactory(ssf);
+
+            httpUrlConn.setDoOutput(true);
+            httpUrlConn.setDoInput(true);
+            httpUrlConn.setUseCaches(false);
+            // 设置请求方式（GET/POST）
+            httpUrlConn.setRequestMethod(requestMethod);
+
+            if ("GET".equalsIgnoreCase(requestMethod)) {
+                httpUrlConn.connect();
+            }
+            // 当有数据需要提交时
+            if (null != outputStr) {
+                OutputStream outputStream = httpUrlConn.getOutputStream();
+                // 注意编码格式，防止中文乱码
+                outputStream.write(outputStr.getBytes("UTF-8"));
+                outputStream.close();
+            }
+
+            // 将返回的输入流转换成字符串
+            InputStream inputStream = httpUrlConn.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream, "utf-8");
+            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+
+            String str = null;
+            while ((str = bufferedReader.readLine()) != null) {
+                buffer.append(str);
+            }
+            bufferedReader.close();
+            inputStreamReader.close();
+            // 释放资源
+            inputStream.close();
+            inputStream = null;
+            httpUrlConn.disconnect();
+
+            jsonObject = new JSONObject(buffer.toString());
+        } catch (ConnectException ce) {
+            LOGGER.error("server connection timed out.");
+        } catch (Exception e) {
+            LOGGER.error("https request error:{}", e);
+        }
+        return jsonObject;
+    }
+
+    public static String getHttp(String url, String param) {
+
+        String result = null;
+
+        InputStream in = null;
+
+        try {
+
+            Proxy proxy = new Proxy(java.net.Proxy.Type.HTTP, new InetSocketAddress("47.74.223.16", Integer.valueOf("1024")));
+
+            String urlNameString = url + "?" + param;
+
+            URL realUrl = new URL(urlNameString);
+
+            System.out.println(urlNameString);
+
+            // 打开和URL之间的连接
+
+            HttpURLConnection connection = (HttpURLConnection) realUrl.openConnection(proxy);
+
+            // 设置通用的请求属性
+
+            connection.setRequestProperty("Connection", "keep-alive");
+
+            // 建立实际的连接
+
+            connection.connect();
+
+            // 定义 BufferedReader输入流来读取URL的响应
+
+            in = connection.getInputStream();
+
+            byte[] inByte = new byte[in.available()];
+
+            in.read(inByte, 0, in.available());
+
+            result = new String(inByte, "utf-8");
+
+            System.out.println(result);
+
+        } catch (Exception e) {
+
+            System.out.println("发送GET请求出现异常！" + e);
+
+            e.printStackTrace();
+
+        }
+
+        // 使用finally块来关闭输入流
+
+        finally {
+
+            try {
+
+                if (in != null) {
+
+                    in.close();
+
+                }
+
+            } catch (Exception e2) {
+
+                e2.printStackTrace();
+
+            }
+
+        }
+
+        return result;
+
+    }
+
+    public static void main(String[] arg) {
+        JSONObject ret = HttpUtil.httpsRequest("https://api.binance.com//api/v1/depth","GET","symbol=ETHBTC&limit=100");
+        //String ret = HttpUtil.getHttp("https://api.binance.com//api/v1/depth","symbol=ETHBTC&limit=100");
+        System.out.println("结果是：" + ret);
+    }
 }
