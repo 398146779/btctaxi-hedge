@@ -1,0 +1,26 @@
+{
+  "bian": {
+    "APIKEY": "lJ8okVlXkpuIEMZk4B6WXrSXUKCydL1eWrXzdrx9aBa2oCaPg5UT6AQ4grmw0cI8",
+    "APISECRET": "LDvX6nhavMqeWj1IEyDaFfuJZhPyz3vXOPr2EQvXNQt8tZ0kXT8cUclYAs4JjZJw",
+    "useServerTime": true,
+    "test": false
+  },
+  "huobi": {
+    "accessKey": "9ef912fe-ae686b6a-2944f3e4-0ad83",
+    "secretKey": "fe821001-2bea431c-34a65fc0-3ec13",
+    "accountID_pro": "3230427",
+    "trade_password": "replace_me"
+  },
+  "thinkbit": {
+    "apiKey": "c3258dc6f929f15983fb07cd438f1a49",
+    "apiSecret": "7aece8af76d0b346a40ccfc259c4a281218d193ae250f4ad16757331730df207",
+    "apiHost": "https://api.thinkbit-beta.com",
+    "wsHost": "wss://ws.thinkbit-beta.com"
+  },
+  "bitfinex": {
+    "apiKey": "duzbKchc8YicQ7DaVtgqHLP1IkEtwbhMeTq6KGvOxAp",
+    "apiSecret": "AEQ6p7CqBKYnlxJbd3jEXGUtSTJKdWoUK4KKYjPf8FK",
+    "wsUrl": "wss://api.bitfinex.com/ws/2",
+    "agent": "socks5://127.0.0.1:1080"
+  }
+}

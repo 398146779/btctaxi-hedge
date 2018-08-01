@@ -6,7 +6,10 @@ import java.security.SecureRandom;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
- 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.logging.SimpleFormatter;
+
 /**
  * @author 18272
  * 证书过期定时任务校验
@@ -14,9 +17,14 @@ import java.security.cert.X509Certificate;
 public class CertUtil {
  
     public static void main(String[] args) {
-        getCertExpired("https://www.baidu.com/");
-    	getCertExpired("https://api.binance.com/api/v1/ping");
-    	
+//        getCertExpired("https://www.baidu.com/");
+//    	getCertExpired("https://api.binance.com/api/v1/ping");
+
+		Date date =  TimeConverterUtil.localToUTC(new Date());
+		SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String str = sf.format(new Date());
+		String ret = str.replace(" ","T");
+		System.out.println(ret);
     }
 	
 	public static void getCertExpired(String httpsUrl) {
