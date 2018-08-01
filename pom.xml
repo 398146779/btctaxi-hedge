@@ -17,8 +17,34 @@
         <spring.version>4.3.13.RELEASE</spring.version>
         <jackson.version>2.9.3</jackson.version>
 
-
     </properties>
+    <!-- 设定主仓库 -->
+    <repositories>
+        <!-- nexus私服 -->
+        <repository>
+            <id> public</id>
+            <url> http://btctaxi.online:8081/nexus/content/groups/public/ </url>
+            <releases>
+                <enabled> true</enabled>
+            </releases>
+            <snapshots>
+                <enabled> true</enabled>
+            </snapshots>
+        </repository>
+
+    </repositories>
+    <!-- 自动打包 -->
+    <distributionManagement>
+        <repository>
+            <id>releases </id>
+            <url> http://btctaxi.online:8081/nexus/content/repositories/releases </url>
+        </repository>
+
+        <snapshotRepository>
+            <id>snapshots </id>
+            <url> http://btctaxi.online:8081/nexus/content/repositories/snapshots </url>
+        </snapshotRepository>
+    </distributionManagement>
     <dependencies>
         <dependency>
             <groupId>com.github.kuhn-he</groupId>
@@ -156,6 +182,11 @@
         <dependency>
             <groupId>com.binance.api</groupId>
             <artifactId>binance-api-client</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.huobi.api</groupId>
+            <artifactId>huobi-java-api</artifactId>
             <version>1.0.0</version>
         </dependency>
     </dependencies>
