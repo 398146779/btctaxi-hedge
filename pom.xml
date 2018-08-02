@@ -52,11 +52,11 @@
             <version>2.1.5</version>
         </dependency>
         <!--&lt;!&ndash; 引入elastic-job-lite核心模块 &ndash;&gt;-->
-        <dependency>
+       <!-- <dependency>
             <groupId>com.dangdang</groupId>
             <artifactId>elastic-job-lite-core</artifactId>
             <version>2.1.5</version>
-        </dependency>
+        </dependency>-->
         <!-- &lt;!&ndash; 使用springframework自定义命名空间时引入 &ndash;&gt;-->
         <dependency>
             <groupId>com.dangdang</groupId>
