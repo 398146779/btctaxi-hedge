@@ -268,7 +268,7 @@ public class HttpUtil {
 
     public static void main(String[] arg) {
         //String ret = HttpUtil.HttpGet("https://api.binance.com/api/v1/time");
-        String ret = HttpUtil.getHttp("https://api.binance.com//api/v1/time","");
+        String ret = HttpUtil.HttpGet("https://api.huobi.pro/market/detail/merged?symbol=btcusdt");
         System.out.println("结果是：" + ret);
     }
 }

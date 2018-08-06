@@ -3,10 +3,13 @@ package com.btctaxi.controller;
 import com.binance.api.client.BinanceApiClientFactory;
 import com.binance.api.client.BinanceApiRestClient;
 import com.binance.api.client.domain.market.BookTicker;
+import com.btctaxi.util.HttpUtil;
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.elasticjob.lite.annotation.ElasticSimpleJob;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.huobi.api.client.HuobiApiRestClient;
-import com.huobi.api.client.domain.Merged;
 import com.huobi.api.client.impl.HuobiApiRestClientImpl;
 import org.springframework.stereotype.Component;
 
@@ -43,9 +46,10 @@ public class TradeJob implements com.dangdang.ddframe.job.api.simple.SimpleJob {
             e.printStackTrace();
         }
     }
-
+    private static final ObjectMapper objectMapper = new ObjectMapper()
+            .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
     @Override
-    public void execute(ShardingContext content) {
+    public void execute(ShardingContext content){
         //do something
         System.out.println("JobName:" + content.getJobName());
         System.out.println("JobParameter:" + content.getJobParameter());
@@ -54,16 +58,41 @@ public class TradeJob implements com.dangdang.ddframe.job.api.simple.SimpleJob {
         System.out.println("ShardingTotalCount:" + content.getShardingTotalCount());
         System.out.println("TaskId:" + content.getTaskId());
         System.out.println("---------------------------------------");
-        Merged merged = client.merged("btcusdt");
+        //Merged merged = client.merged("btcusdt");
+        String json = HttpUtil.HttpGet("https://api.huobi.pro/market/detail/merged?symbol=btcusdt");
+        ObjectMapper mapper = new ObjectMapper();
+        String askPrice ="";
+        String bidPrice ="";
+        try{
+            JsonNode rootNode = mapper.readTree(json);
+            JsonNode tick = rootNode.path("tick");
+            JsonNode ask = tick.path("ask");
+            String askString = mapper.writeValueAsString(ask);
+            askPrice = askString.split(",")[0];
+            askPrice= askPrice.substring(1,askPrice.length());
+
+            JsonNode bid = tick.path("bid");
+            String bidString = mapper.writeValueAsString(bid);
+            bidPrice = bidString.split(",")[0];
+            bidPrice = bidPrice.substring(1, bidPrice.length());
+            System.out.println(askPrice);
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        //String json = HttpUtil.HttpGet("https://api.binance.com/api/v1/ticker/allBookTickers?symbol=btcusdt");
+
         BinanceApiRestClient binanceApiRestClient = factory.newRestClient();
         List<BookTicker> bookTickers = binanceApiRestClient.getBookTickers();
         for (BookTicker bookTicker : bookTickers) {
             if ("btcusdt".equals(bookTicker.getSymbol())) {
                 //买价小于
-                if (Double.valueOf(bookTicker.getAskPrice()) < huobi_fee + binance_fee + merged.getBid().getPrice() + margin) {
+                if (Double.valueOf(bookTicker.getAskPrice()) < huobi_fee + binance_fee + Double.valueOf(bidPrice) + margin) {
 
                 }
-                if (merged.getAsk().getPrice() < huobi_fee + binance_fee + Double.valueOf(bookTicker.getBidPrice()) + margin) {
+                if (Double.valueOf(askPrice)< huobi_fee + binance_fee + Double.valueOf(bookTicker.getBidPrice()) + margin) {
 
                 }
                 break;
@@ -72,5 +101,4 @@ public class TradeJob implements com.dangdang.ddframe.job.api.simple.SimpleJob {
 
     }
 
-}
 }
