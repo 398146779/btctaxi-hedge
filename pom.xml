@@ -18,30 +18,15 @@
         <jackson.version>2.9.3</jackson.version>
 
     </properties>
-    <!-- 设定主仓库 -->
-    <repositories>
-        <!-- nexus私服 -->
-        <repository>
-            <id> public</id>
-            <url> http://btctaxi.online:8081/nexus/content/groups/public/ </url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
-    </repositories>
     <!-- 自动打包 -->
     <distributionManagement>
         <repository>
-            <id>releases </id>
+            <id>nexus-releases </id>
             <url> http://btctaxi.online:8081/nexus/content/repositories/releases </url>
         </repository>
 
         <snapshotRepository>
-            <id>snapshots </id>
+            <id>nexus-snapshots </id>
             <url> http://btctaxi.online:8081/nexus/content/repositories/snapshots </url>
         </snapshotRepository>
     </distributionManagement>
@@ -62,30 +47,6 @@
             <groupId>com.dangdang</groupId>
             <artifactId>elastic-job-lite-spring</artifactId>
             <version>2.1.5</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-activemq</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
@@ -173,13 +134,14 @@
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <version>2.4</version>
+            <classifier>jdk15</classifier>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20150729</version>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>com.binance.api</groupId>
             <artifactId>binance-api-client</artifactId>
             <version>1.0.0</version>
@@ -187,8 +149,8 @@
         <dependency>
             <groupId>com.huobi.api</groupId>
             <artifactId>huobi-java-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
+            <version>1.0.2</version>
+        </dependency>-->
     </dependencies>
 
     <build>
