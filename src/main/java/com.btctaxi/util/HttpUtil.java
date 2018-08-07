@@ -13,9 +13,10 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
-
-import javax.net.ssl.*;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
 import java.io.*;
 import java.net.*;
 import java.util.List;
@@ -118,8 +119,7 @@ public class HttpUtil {
      * @param outputStr     提交的数据
      * @return JSONObject(通过JSONObject.get(key)的方式获取json对象的属性值)
      */
-    public static JSONObject httpsRequest(String requestUrl, String requestMethod, String outputStr) {
-        JSONObject jsonObject = null;
+    public static String httpsRequest(String requestUrl, String requestMethod, String outputStr) {
         StringBuffer buffer = new StringBuffer();
         try {
             // 创建SSLContext对象，并使用我们指定的信任管理器初始化
@@ -165,13 +165,13 @@ public class HttpUtil {
             inputStream = null;
             httpUrlConn.disconnect();
 
-            jsonObject = new JSONObject(buffer.toString());
+            return buffer.toString();
         } catch (ConnectException ce) {
             LOGGER.error("server connection timed out.");
         } catch (Exception e) {
             LOGGER.error("https request error:{}", e);
         }
-        return jsonObject;
+        return "";
     }
 
     public static String getHttp(String url, String param) {
@@ -249,26 +249,27 @@ public class HttpUtil {
     /*
       * 设置证书。
       */
-    static{
-        javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
-                new javax.net.ssl.HostnameVerifier(){
-                    public boolean verify(String hostname,
-                                          javax.net.ssl.SSLSession sslSession) {
-                        //域名或ip地址
-                        if (hostname.equals("https://api.binance.com")) {
-                            return true;
-                        }
-                        return false;
-                    }
-                });
-        //第二个参数为证书的路径
-        System.setProperty("javax.net.ssl.trustStore", "/Users/zhangsl/Documents/Digit.cer");
-        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
-    }
+//    static {
+//        javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+//                new javax.net.ssl.HostnameVerifier() {
+//
+//                    public boolean verify(String hostname,
+//                                          javax.net.ssl.SSLSession sslSession) {
+//                        //域名或ip地址
+//                        if (hostname.equals("https://api.binance.com")) {
+//                            return true;
+//                        }
+//                        return false;
+//                    }
+//                });
+//        //第二个参数为证书的路径
+//        System.setProperty("javax.net.ssl.trustStore", "/Users/zhangsl/Documents/Digit.cer");
+//        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+//    }
 
     public static void main(String[] arg) {
-        //String ret = HttpUtil.HttpGet("https://api.binance.com/api/v1/time");
-        String ret = HttpUtil.getHttp("https://api.binance.com//api/v1/time","");
+        String ret = HttpUtil.HttpGet("https://api.binance.com/api/v1/time");
+        //String ret = HttpUtil.HttpGet("https://api.huobi.pro/market/detail/merged?symbol=btcusdt");
         System.out.println("结果是：" + ret);
     }
 }

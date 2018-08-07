@@ -1,14 +1,11 @@
 package com.btctaxi.service;
 
-import org.springframework.stereotype.Service;
-
-/**
- * bian,的行情，深度，
- */
-@Service
 public interface HuobiService {
-    /**
-     *
-     */
-   String getQutotion();
+    public void onKlineTick();
+
+    public void onDepthTick();
+
+    public void onTradeDetailTick();
+
+    public void onMarketDetailTick();
 }
