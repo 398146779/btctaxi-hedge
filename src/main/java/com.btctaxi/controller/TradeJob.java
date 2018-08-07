@@ -87,13 +87,15 @@ public class TradeJob implements com.dangdang.ddframe.job.api.simple.SimpleJob {
         BinanceApiRestClient binanceApiRestClient = factory.newRestClient();
         List<BookTicker> bookTickers = binanceApiRestClient.getBookTickers();
         for (BookTicker bookTicker : bookTickers) {
+            System.out.println("============="+bookTicker.getSymbol());
             if ("btcusdt".equals(bookTicker.getSymbol())) {
+                System.out.println("=====btcusdt========"+bookTicker.getSymbol());
                 //买价小于
                 if (Double.valueOf(bookTicker.getAskPrice()) < huobi_fee + binance_fee + Double.valueOf(bidPrice) + margin) {
-
+                    System.out.println("=====btcusdt买========"+bookTicker.getSymbol());
                 }
                 if (Double.valueOf(askPrice)< huobi_fee + binance_fee + Double.valueOf(bookTicker.getBidPrice()) + margin) {
-
+                    System.out.println("=====btcusdt卖========"+bookTicker.getSymbol());
                 }
                 break;
             }
